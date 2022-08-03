@@ -4,13 +4,13 @@ import time
 import psutil
 
 
-# minCpu=os.getenv("MIN_MEM_VALUE")
-# minMem=os.getenv("MIN_CPU_VALUE")
+minCpu=os.getenv("MIN_MEM_VALUE")
+minMem=os.getenv("MIN_CPU_VALUE")
 
-minCpu=1
-minMem=1
-instanceName="Test-b"
-jobName="psUtil"
+# minCpu=1
+# minMem=1
+instanceName=os.getenv("INSTANCE_NAME")
+jobName=os.getenv("JOB_NAME")
 
 cpu_count=len(psutil.Process().cpu_affinity())
 

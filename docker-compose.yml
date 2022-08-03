@@ -7,7 +7,8 @@ services:
     environment:
         SERVER_HOST: 3.127.247.150:9091
         INTERVAL_S: 60
-        INSTANCE_NAME: instace_name
+        INSTANCE_NAME: autotesty
+        JOB_NAME: test
         MIN_CPU_VALUE: 1
         MIN_MEM_VALUE: 1
         WITH_PID: "true"
