@@ -14,7 +14,7 @@ import psutil
 minCpu=1
 minMem=1
 
-instanceName="test-nr-123124"
+# instanceName="test-nr-123124"
 jobName="test-nr-123124"
 
 interval=60
