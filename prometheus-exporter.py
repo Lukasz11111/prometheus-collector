@@ -4,13 +4,21 @@ import time
 import psutil
 
 
-minCpu=os.getenv("MIN_MEM_VALUE")
-minMem=os.getenv("MIN_CPU_VALUE")
+# minCpu=os.getenv("MIN_MEM_VALUE")
+# minMem=os.getenv("MIN_CPU_VALUE")
 
-# minCpu=1
-# minMem=1
-instanceName=os.getenv("INSTANCE_NAME")
-jobName=os.getenv("JOB_NAME")
+
+# instanceName=os.getenv("INSTANCE_NAME")
+# jobName=os.getenv("JOB_NAME")
+
+minCpu=1
+minMem=1
+
+instanceName="test-nr-123124"
+jobName="test-nr-123124"
+
+interval=60
+
 
 cpu_count=len(psutil.Process().cpu_affinity())
 
@@ -92,51 +100,7 @@ while True:
     push_to_gateway('3.127.247.150:9091', job=jobName, registry=registry)
     # print("push")
 
-    time.sleep(15)
-# for proc in psutil.process_iter():
-
-#     if proc.cpu_percent(interval=None)>0:
-#         print(f"{proc.name()} cpu: {proc.cpu_percent()}  mem: {proc.memory_percent()} ",flush=True)
-
-
-
-# p = psutil.Process(3198914)
-
-# print(p.cpu_percent(),flush=True)
-
-
-
-# p = psutil.Process(pid=3198914)
-
-# print(p.cpu_percent(interval=10))
-# print(p.cpu_percent(interval=None))
-# print(p.name())
-
-# time.sleep(10)
-
-# print(p.cpu_percent(interval=None))
-# for i in range(100):
-#     usage = p.cpu_percent(interval=None, percpu=False)
-#     print(usage)
-    # do other things
-
-# cpu = psutil.cpu_times_percent(interval=0.4, percpu=False)
-# print(cpu)
-# print(psutil.cpu_percent(),flush=True)
-
-# p = psutil.Process()
-# with p.oneshot():
-#     p.name()  # execute internal routine once collecting multiple info
-#     p.cpu_times()  # return cached value
-#     p.cpu_percent()  # return cached value
-#     p.create_time()  # return cached value
-#     p.ppid()  # return cached value
-#     p.status()  # return cached value
-#     print(p.cpu_percent(),flush=True)
-
-# print(dir( psutil),flush=True)
-# print(dir( psutil),flush=True)
-    # time.sleep(15)
+    time.sleep(interval)
 
 
 
