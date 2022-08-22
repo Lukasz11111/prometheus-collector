@@ -93,12 +93,15 @@ def singleProcess(registry):
 
 
 while True:
-    registry = CollectorRegistry()
-    # g = Gauge('job_last_success_unixtime', 'Last time a batch job successfully finished', registry=registry)
-    main(registry)
-    
-    push_to_gateway('3.127.247.150:9091', job=jobName, registry=registry)
-    # print("push")
+    try:
+        registry = CollectorRegistry()
+        # g = Gauge('job_last_success_unixtime', 'Last time a batch job successfully finished', registry=registry)
+        main(registry)
+        
+        push_to_gateway('3.127.247.150:9091', job=jobName, registry=registry)
+        # print("push")
+    except:
+        pass
 
     time.sleep(interval)
 
