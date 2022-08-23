@@ -14,7 +14,7 @@ import psutil
 minCpu=1
 minMem=1
 
-# instanceName="test-nr-123124"
+instanceName="test-nr-123124"
 jobName="test-nr-123124"
 
 interval=60
@@ -67,11 +67,23 @@ def saveDps(registry):
         g.set_function(getFreeDiskSpacePercentLambdaFactory(partition.mountpoint)) 
 
 
+# import os
+# def get_pname(id):
+#     return os.system("ps -o cmd= {}".format(id))
+
+from subprocess import PIPE, Popen
+
+def get_pname(pid):
+    with Popen(f"ps -q {pid} -o cmd=", shell=True, stdout=PIPE) as p:
+        return str(p.communicate()[0])[0:75]
+
+
+
 def saveMem(proc,memoryGauge):
 
     r=proc.memory_percent()
     if float(r)>float(minMem):
-        memoryGauge.labels(proc.name(), proc.pid,instanceName).set(r)
+        memoryGauge.labels(proc.name(),get_pname(proc.pid), proc.pid,instanceName).set(r)
     
 
 def saveCPU(proc,cpuUsage):
@@ -79,14 +91,14 @@ def saveCPU(proc,cpuUsage):
     r=proc.cpu_percent(interval=None)/cpu_count
     if float(r)>float(minCpu):
 
-        cpuUsage.labels(proc.name(), proc.pid,instanceName).set(r)
+        cpuUsage.labels(proc.name(),get_pname(proc.pid), proc.pid,instanceName).set(r)
 
 
         
 
 def singleProcess(registry):
-    memoryGauge = Gauge('memmory_usage', 'Usage of memory in percent', ["Name", "PID","instance"] ,registry=registry)
-    cpuUsage = Gauge('cpu_usage', 'Usage of the CPU in percent', ["Name", "PID", "instance"], registry=registry)
+    memoryGauge = Gauge('memmory_usage', 'Usage of memory in percent', ["Name", "FullName", "PID","instance"] ,registry=registry)
+    cpuUsage = Gauge('cpu_usage', 'Usage of the CPU in percent', ["Name", "FullName", "PID", "instance"], registry=registry)
     for proc in psutil.process_iter():
         saveCPU(proc,cpuUsage)
         saveMem(proc,memoryGauge)
@@ -100,9 +112,10 @@ while True:
         
         push_to_gateway('3.127.247.150:9091', job=jobName, registry=registry)
         # print("push")
-    except:
+    except Exception as e:
+        print(e)
         pass
-
+    print("loop")
     time.sleep(interval)
 
 
