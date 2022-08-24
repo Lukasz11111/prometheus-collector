@@ -3,21 +3,22 @@ import os
 import time
 import psutil
 
+from dotenv import load_dotenv
 
-# minCpu=os.getenv("MIN_MEM_VALUE")
-# minMem=os.getenv("MIN_CPU_VALUE")
+load_dotenv()
 
 
-# instanceName=os.getenv("INSTANCE_NAME")
-# jobName=os.getenv("JOB_NAME")
 
-minCpu=1
-minMem=1
+minCpu=float(os.getenv("MIN_MEM_VALUE"))
+minMem=float(os.getenv("MIN_CPU_VALUE"))
 
-instanceName="test-nr-123124"
-jobName="test-nr-123124"
+instanceName=str(os.getenv("INSTANCE_NAME"))
+jobName=str(os.getenv("JOB_NAME"))
 
-interval=60
+interval=int(os.getenv("INTERVAL"))
+
+pushgetway=str(os.getenv("PUSHGETWAY_HOST"))
+
 
 
 cpu_count=len(psutil.Process().cpu_affinity())
@@ -110,12 +111,11 @@ while True:
         # g = Gauge('job_last_success_unixtime', 'Last time a batch job successfully finished', registry=registry)
         main(registry)
         
-        push_to_gateway('3.127.247.150:9091', job=jobName, registry=registry)
+        push_to_gateway(pushgetway, job=jobName, registry=registry)
         # print("push")
     except Exception as e:
-        print(e)
+
         pass
-    print("loop")
     time.sleep(interval)
 
 
