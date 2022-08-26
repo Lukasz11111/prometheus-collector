@@ -79,12 +79,33 @@ def get_pname(pid):
         return str(p.communicate()[0])[0:75]
 
 
-
 def saveMem(proc,memoryGauge):
-
     r=proc.memory_percent()
     if float(r)>float(minMem):
         memoryGauge.labels(proc.name(),get_pname(proc.pid), proc.pid,instanceName).set(r)
+
+
+def bytesto(bytes, to, bsize=1024):
+    """convert bytes to megabytes, etc.
+       sample code:
+           print('mb= ' + str(bytesto(314575262000000, 'm')))
+       sample output: 
+           mb= 300002347.946
+    """
+
+    a = {'k' : 1, 'm': 2, 'g' : 3, 't' : 4, 'p' : 5, 'e' : 6 }
+    r = float(bytes)
+    for i in range(a[to]):
+        r = r / bsize
+
+    return(r)
+
+def saveMemRES(proc,memoryGauge):
+    r=proc.memory_info()
+    minMemRes=psutil.virtual_memory().total*(minMem/100)
+    if float(r[0])>float(minMemRes):
+            memoryGauge.labels(proc.name(),get_pname(proc.pid), proc.pid,instanceName).set(bytesto(r[0],"m"))
+
     
 
 def saveCPU(proc,cpuUsage):
@@ -95,14 +116,17 @@ def saveCPU(proc,cpuUsage):
         cpuUsage.labels(proc.name(),get_pname(proc.pid), proc.pid,instanceName).set(r)
 
 
+
         
 
 def singleProcess(registry):
     memoryGauge = Gauge('memmory_usage', 'Usage of memory in percent', ["Name", "FullName", "PID","instance"] ,registry=registry)
     cpuUsage = Gauge('cpu_usage', 'Usage of the CPU in percent', ["Name", "FullName", "PID", "instance"], registry=registry)
+    memoryRESGauge=Gauge('memmory_res_usage', 'Usage of memory in mb', ["Name", "FullName", "PID", "instance"], registry=registry)
     for proc in psutil.process_iter():
         saveCPU(proc,cpuUsage)
         saveMem(proc,memoryGauge)
+        saveMemRES(proc,memoryRESGauge)
 
 
 while True:
@@ -114,7 +138,7 @@ while True:
         push_to_gateway(pushgetway, job=jobName, registry=registry)
         # print("push")
     except Exception as e:
-
+        print(e)
         pass
     time.sleep(interval)
 
