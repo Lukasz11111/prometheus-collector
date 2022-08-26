@@ -9,8 +9,8 @@ load_dotenv()
 
 
 
-minCpu=float(os.getenv("MIN_MEM_VALUE"))
-minMem=float(os.getenv("MIN_CPU_VALUE"))
+minMem=float(os.getenv("MIN_MEM_VALUE"))
+minCpu=float(os.getenv("MIN_CPU_VALUE"))
 
 instanceName=str(os.getenv("INSTANCE_NAME"))
 jobName=str(os.getenv("JOB_NAME"))
