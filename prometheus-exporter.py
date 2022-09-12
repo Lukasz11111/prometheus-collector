@@ -2,7 +2,7 @@ from prometheus_client import  Gauge, push_to_gateway, CollectorRegistry
 import os
 import time
 import psutil
-
+import getTraceAndRecording as traceRec
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,7 +19,7 @@ interval=int(os.getenv("INTERVAL"))
 
 pushgetway=str(os.getenv("PUSHGETWAY_HOST"))
 
-
+rdbPanel=os.getenv("GRAFAMA_RDB_PANEL")
 
 cpu_count=len(psutil.Process().cpu_affinity())
 
@@ -49,9 +49,24 @@ def gettSingleProcessMemoryUsageFactory(proc):
     return lambda: gettSingleProcessMemoryUsage(proc)
 
 
+def traceRecGauge(registry):
+    dictTraceRec=traceRec.main()
+    traceAll = Gauge('traceAll', 'Trace in RevDeBug', ["instance"],registry=registry)
+    traceAll.labels(instanceName).set(dictTraceRec["trace"])
+    
+    dictTraceRec=traceRec.main()
+    recAll = Gauge('recordingAll', 'Recording in RevDeBug', ["instance"],registry=registry)
+    recAll.labels(instanceName).set(dictTraceRec["recording"])
+    
+    
 
 def main(registry):
-    # saveDps(registry)
+    try:
+        if int(rdbPanel)==1:
+            traceRecGauge(registry)
+    except:
+        pass
+    
     cpuUsage_all = Gauge('cpu_usage_all', 'Usage of the CPU in percent', ["instance"],registry=registry)
     cpuUsage_all.labels(instanceName).set(psutil.cpu_percent(interval=None))
 
@@ -133,6 +148,7 @@ while True:
     try:
         registry = CollectorRegistry()
         # g = Gauge('job_last_success_unixtime', 'Last time a batch job successfully finished', registry=registry)
+        
         main(registry)
         
         push_to_gateway(pushgetway, job=jobName, registry=registry)
