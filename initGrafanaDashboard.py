@@ -36,6 +36,7 @@ else:
 for panel in data['dashboard']['panels'][1:]:
     panel["targets"][0]["expr"]=str(panel["targets"][0]["expr"]).replace("MyInstance",instanceName)
     panel["title"]=f'{panel["title"]} - {instanceName}'
+    
 
 
 

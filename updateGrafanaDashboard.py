@@ -39,9 +39,8 @@ if int(rdbPanel)==0:
 for panel in panels['panels'][1:]:
     panel["targets"][0]["expr"]=str(panel["targets"][0]["expr"]).replace("MyInstance",instanceName)
     panel["title"]=f'{panel["title"]} - {instanceName}'
-# print(panels['panels'][0]['panels'])
+    
 
-# print(data['dashboard']['panels'])
 for panel in panels['panels']:
     data['dashboard']['panels'].append(panel)
 
@@ -57,25 +56,3 @@ print(r)
 print(r.text)
 print(r.status_code)
 
-# if dashboardName:
-#     data['dashboard']['title']=dashboardName
-# else:
-#     print("Set GRAFANA_DASHBOARD in .env file")
-#     exit()
-
-# if dashboardPanel:
-#     data['dashboard']['panels'][0]["title"]=dashboardPanel
-# else:
-#     data['dashboard']['panels'][0]["title"]="Panel"
-
-
-
-
-# for panel in data['dashboard']['panels'][1:]:
-#     panel["targets"][0]["expr"]=str(panel["targets"][0]["expr"]).replace("MyInstance",instanceName)
-
-
-
-
-# headers = {'Content-type': 'application/json', 'Accept': 'application/json',"Authorization": authorization}
-# r= requests.post(url="http://18.193.73.140:3000/api/dashboards/db",  data=json.dumps(data,ensure_ascii=False) , headers=headers)

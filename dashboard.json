@@ -119,7 +119,7 @@
         },
         "editorMode": "builder",
         "expr": "recordingAll{exported_instance=\"MyInstance\"}",
-        "legendFormat": "{{__name__}}",
+        "legendFormat": "{{__name__}} - {{exported_job}}",
         "range": true,
         "refId": "A"
       }
@@ -202,7 +202,7 @@
         },
         "editorMode": "builder",
         "expr": "traceAll{exported_job=\"MyInstance\"}",
-        "legendFormat": "{{__name__}}",
+        "legendFormat": "{{__name__}} - {{exported_job}}",
         "range": true,
         "refId": "A"
       }
@@ -284,7 +284,7 @@
                   },
                   "editorMode": "builder",
                   "expr": "cpu_usage_all{exported_instance=\"MyInstance\"}",
-                  "legendFormat": "{{__name__}}",
+                  "legendFormat": "{{__name__}} - {{exported_job}}",
                   "range": true,
                   "refId": "A"
               }
@@ -367,7 +367,7 @@
                   },
                   "editorMode": "builder",
                   "expr": "cpu_usage{exported_instance=\"MyInstance\"}",
-                  "legendFormat": "{{Name}} -  {{PID}}",
+                  "legendFormat": "{{Name}} - {{PID}} - {{exported_job}}",
                   "range": true,
                   "refId": "A"
               }
@@ -475,7 +475,7 @@
                   },
                   "editorMode": "builder",
                   "expr": "memmory_usage_all{exported_instance=\"MyInstance\"}",
-                  "legendFormat": "{{__name__}}",
+                  "legendFormat": "{{__name__}} - {{exported_job}}",
                   "range": true,
                   "refId": "A"
               }
@@ -557,7 +557,7 @@
                   },
                   "editorMode": "builder",
                   "expr": "memmory_usage{exported_instance=\"MyInstance\"}",
-                  "legendFormat": "{{Name}} - {{PID}}",
+                  "legendFormat": "{{Name}} - {{PID}} - {{exported_job}}",
                   "range": true,
                   "refId": "A"
               }
@@ -641,7 +641,7 @@
                   "editorMode": "builder",
                   "expr": "memmory_res_usage{exported_instance=\"MyInstance\"}",
                   "interval": "",
-                  "legendFormat": "{{Name}} - {{PID}}",
+                  "legendFormat": "{{Name}} - {{PID}} - {{exported_job}}",
                   "range": true,
                   "refId": "A"
               }
