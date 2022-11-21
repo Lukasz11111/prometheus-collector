@@ -4,11 +4,20 @@ import time
 import psutil
 import getTraceAndRecording as traceRec
 from dotenv import load_dotenv
-
+import subprocess
+from subprocess import PIPE, Popen
 load_dotenv()
 
+netstatContainerName=str(os.getenv("NETSTAT_CONTAINER_NAME"))
 
+def init_():
+    if netstatContainerName!='':
+        try:
+            subprocess.run("sudo docker  cp /bin/netstat revdebug-devops-1:/bin/netstat", shell=True, check=True)
+        except:
+            pass
 
+init_()
 minMem=float(os.getenv("MIN_MEM_VALUE"))
 minCpu=float(os.getenv("MIN_CPU_VALUE"))
 
@@ -57,8 +66,18 @@ def traceRecGauge(registry):
     dictTraceRec=traceRec.main()
     recAll = Gauge('recordingAll', 'Recording in RevDeBug', ["instance"],registry=registry)
     recAll.labels(instanceName).set(dictTraceRec["recording"])
-    
-    
+
+def getNetStat(connect_status):
+    if netstatContainerName!='':
+        try:
+            command = f"sudo docker  exec -it  {netstatContainerName} netstat -tn | grep 42734 | grep {str(connect_status).upper()} | wc -l"
+            process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+            output, error = process.communicate()
+            result_=output.decode("utf-8")
+            cpuUsage_all = Gauge(connect_status, f'Count of {connect_status} connect', ["instance","container"],registry=registry)
+            cpuUsage_all.labels(instanceName,netstatContainerName).set(int(result_))
+        except Exception as e:
+            print(e)
 
 def main(registry):
     try:
@@ -66,7 +85,10 @@ def main(registry):
             traceRecGauge(registry)
     except:
         pass
-    
+    getNetStat("close_wait")
+    getNetStat("time_wait")
+    getNetStat("established")
+   
     cpuUsage_all = Gauge('cpu_usage_all', 'Usage of the CPU in percent', ["instance"],registry=registry)
     cpuUsage_all.labels(instanceName).set(psutil.cpu_percent(interval=None))
 
