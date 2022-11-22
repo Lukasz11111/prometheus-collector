@@ -18,6 +18,18 @@ os_ip="127.0.0.1"
 global rdbErr
 rdbErr=0
 
+
+from subprocess import PIPE, Popen
+
+def getSizeRDB(directory):
+    command = f"sudo df  --output=used {directory}"
+    process = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+    output, error = process.communicate()
+
+    s=str(output.decode("utf-8"))
+    s = s.split("\n",2)
+    return s[1]
+
 def getContainersIP():
     global pg_ip
     global os_ip
@@ -60,10 +72,11 @@ except:
 
 def main():
     global rdbErr
-    result={"trace":"","recording":""}
+    result={"trace":"","recording":"","size":""}
     try:
         result["trace"]=getTraceCount()
         result["recording"]=queryPg()[0][0]
+        result["size"]=getSizeRDB("/var/revdebug/server/repo")
     except Exception as e:
         print(rdbErr)
         if rdbErr>3:

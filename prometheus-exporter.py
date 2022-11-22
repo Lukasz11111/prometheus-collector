@@ -59,13 +59,16 @@ def gettSingleProcessMemoryUsageFactory(proc):
 
 
 def traceRecGauge(registry):
+
     dictTraceRec=traceRec.main()
     traceAll = Gauge('traceAll', 'Trace in RevDeBug', ["instance"],registry=registry)
     traceAll.labels(instanceName).set(dictTraceRec["trace"])
     
-    dictTraceRec=traceRec.main()
     recAll = Gauge('recordingAll', 'Recording in RevDeBug', ["instance"],registry=registry)
     recAll.labels(instanceName).set(dictTraceRec["recording"])
+
+    size = Gauge('diskSize', 'Amount of Disk Occupied', ["instance"],registry=registry)
+    size.labels(instanceName).set(dictTraceRec["size"])
 
 def getNetStat(connect_status):
     if netstatContainerName!='':
