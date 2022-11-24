@@ -6,12 +6,21 @@ import getTraceAndRecording as traceRec
 from dotenv import load_dotenv
 import subprocess
 from subprocess import PIPE, Popen
+import re
+
 load_dotenv()
 
 netstatContainerName=str(os.getenv("NETSTAT_CONTAINER_NAME"))
 
+global  old_value_send
+global  old_value_recv
+
 def init_():
-    if netstatContainerName!='':
+    global  old_value_send
+    global  old_value_recv
+    old_value_send=0
+    old_value_recv=0
+    if f"{netstatContainerName}"!='None':
         try:
             subprocess.run("sudo docker  cp /bin/netstat revdebug-devops-1:/bin/netstat", shell=True, check=True)
         except:
@@ -32,6 +41,32 @@ rdbPanel=os.getenv("GRAFAMA_RDB_PANEL")
 
 cpu_count=len(psutil.Process().cpu_affinity())
 
+def getCallsPerSecond():
+    list_result={"count":0,"calls":0}
+    if netstatContainerName!='':
+        infile = os.getenv("LOG_JM_PATH")
+        if os.path.exists(infile):
+            with open(infile) as f:
+                f = f.readlines()
+            for line in f:
+                if "summary +" in line:
+                    line_=line.split("summary +")[1]
+                    list_result["calls"] =float(line_.split("in")[1].split("=")[1].split("/s")[0])
+                if "summary =" in line:    
+                    line_=line.split("summary =")[1]
+                    list_result["count"]=int(line_.split("in")[0])
+                    
+    return list_result
+
+def sendCallPS(registry):
+    try:
+        list_result=getCallsPerSecond()
+        call_per_sec = Gauge('call_per_sec', 'Jmeter call per s hist app', ["instance"],registry=registry)
+        call_per_sec.labels(instanceName).set(list_result["calls"])
+        count_jm = Gauge('count_jm', 'Jmeter call count', ["instance"],registry=registry)
+        count_jm.labels(instanceName).set(list_result["count"])
+    except Exception as e:
+        print(e)
 
 def getCpuStats():
     return psutil.cpu_percent(interval=None)
@@ -70,8 +105,8 @@ def traceRecGauge(registry):
     size = Gauge('diskSize', 'Amount of Disk Occupied', ["instance"],registry=registry)
     size.labels(instanceName).set(dictTraceRec["size"])
 
-def getNetStat(connect_status):
-    if netstatContainerName!='':
+def getNetStat(connect_status,registry):
+    if netstatContainerName!='None':
         try:
             command = f"sudo docker  exec -it  {netstatContainerName} netstat -tn | grep 42734 | grep {str(connect_status).upper()} | wc -l"
             process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
@@ -82,15 +117,40 @@ def getNetStat(connect_status):
         except Exception as e:
             print(e)
 
+def net_io(registry):
+    global  old_value_send
+    global  old_value_recv
+    new_value_send = psutil.net_io_counters().bytes_sent
+    new_value_recv = psutil.net_io_counters().bytes_recv
+
+    if old_value_send and old_value_recv:
+        res_send=new_value_send-old_value_send
+        res_recv=new_value_recv-old_value_recv
+        if res_send<0:
+            res_send=0
+        if res_recv<0:
+            res_recv=0
+            
+        net_send = Gauge('net_send', 'Network byte send', ["instance"],registry=registry)
+        net_send.labels(instanceName).set(res_send)
+
+        net_recv = Gauge('net_recv', 'Network byte send',["instance"], registry=registry)
+        net_recv.labels(instanceName).set(res_recv)
+    old_value_send = new_value_send
+    old_value_recv = new_value_recv
+
+
 def main(registry):
+    net_io()
     try:
         if int(rdbPanel)==1:
             traceRecGauge(registry)
     except:
         pass
-    getNetStat("close_wait")
-    getNetStat("time_wait")
-    getNetStat("established")
+    sendCallPS(registry)
+    getNetStat("close_wait",registry)
+    getNetStat("time_wait",registry)
+    getNetStat("established",registry)
    
     cpuUsage_all = Gauge('cpu_usage_all', 'Usage of the CPU in percent', ["instance"],registry=registry)
     cpuUsage_all.labels(instanceName).set(psutil.cpu_percent(interval=None))
