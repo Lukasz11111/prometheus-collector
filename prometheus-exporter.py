@@ -22,7 +22,7 @@ def init_():
     old_value_recv=0
     if f"{netstatContainerName}"!='None':
         try:
-            subprocess.run("sudo docker  cp /bin/netstat revdebug-devops-1:/bin/netstat", shell=True, check=True)
+            subprocess.run(f"sudo docker  cp /bin/netstat {netstatContainerName}:/bin/netstat", shell=True, check=True)
         except:
             pass
 
