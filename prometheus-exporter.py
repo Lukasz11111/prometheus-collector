@@ -32,6 +32,7 @@ minCpu=float(os.getenv("MIN_CPU_VALUE"))
 
 instanceName=str(os.getenv("INSTANCE_NAME"))
 jobName=str(os.getenv("JOB_NAME"))
+jmLogs = os.getenv("LOG_JM_PATH")
 
 interval=int(os.getenv("INTERVAL"))
 
@@ -44,9 +45,9 @@ cpu_count=len(psutil.Process().cpu_affinity())
 def getCallsPerSecond():
     list_result={"count":0,"calls":0}
     if netstatContainerName!='':
-        infile = os.getenv("LOG_JM_PATH")
-        if os.path.exists(infile):
-            with open(infile) as f:
+        
+        if os.path.exists(jmLogs):
+            with open(jmLogs) as f:
                 f = f.readlines()
             for line in f:
                 if "summary +" in line:
@@ -60,11 +61,12 @@ def getCallsPerSecond():
 
 def sendCallPS(registry):
     try:
-        list_result=getCallsPerSecond()
-        call_per_sec = Gauge('call_per_sec', 'Jmeter call per s hist app', ["instance"],registry=registry)
-        call_per_sec.labels(instanceName).set(list_result["calls"])
-        count_jm = Gauge('count_jm', 'Jmeter call count', ["instance"],registry=registry)
-        count_jm.labels(instanceName).set(list_result["count"])
+        if jmLogs!='None':
+            list_result=getCallsPerSecond()
+            call_per_sec = Gauge('call_per_sec', 'Jmeter call per s hist app', ["instance"],registry=registry)
+            call_per_sec.labels(instanceName).set(list_result["calls"])
+            count_jm = Gauge('count_jm', 'Jmeter call count', ["instance"],registry=registry)
+            count_jm.labels(instanceName).set(list_result["count"])
     except Exception as e:
         print(e)
 
