@@ -141,7 +141,7 @@ def net_io(registry):
 
 
 def main(registry):
-    net_io()
+    net_io(registry)
     try:
         if int(rdbPanel)==1:
             traceRecGauge(registry)
