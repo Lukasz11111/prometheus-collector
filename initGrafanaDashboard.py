@@ -15,6 +15,7 @@ dashboardName=os.getenv("GRAFANA_DASHBOARD_NAME")
 dashboardPanel=os.getenv("GRAFANA_DASHBOARD_PANEL")
 authorization=os.getenv("GRAFANA_API_KEY")
 rdbPanel=os.getenv("GRAFAMA_RDB_PANEL")
+grafanHost=os.getenv("GRAFANA_HOST")
 
 if int(rdbPanel)==0:
     data['dashboard']["panels"].pop(1)
@@ -41,4 +42,4 @@ for panel in data['dashboard']['panels'][1:]:
 
 
 headers = {'Content-type': 'application/json', 'Accept': 'application/json',"Authorization": authorization}
-r= requests.post(url="http://18.193.73.140:3000/api/dashboards/db",  data=json.dumps(data,ensure_ascii=False) , headers=headers)
+r= requests.post(url=f"http://{grafanHost}/api/dashboards/db",  data=json.dumps(data,ensure_ascii=False) , headers=headers)
