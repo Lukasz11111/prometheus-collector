@@ -32,7 +32,7 @@ minCpu=float(os.getenv("MIN_CPU_VALUE"))
 
 instanceName=str(os.getenv("INSTANCE_NAME"))
 jobName=str(os.getenv("JOB_NAME"))
-jmLogs = os.getenv("LOG_JM_PATH")
+jmLogs = str(os.getenv("LOG_JM_PATH"))
 
 interval=int(os.getenv("INTERVAL"))
 
