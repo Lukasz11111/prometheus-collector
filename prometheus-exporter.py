@@ -110,7 +110,7 @@ def traceRecGauge(registry):
 def getNetStat(connect_status,registry):
     if netstatContainerName!='None':
         try:
-            command = f"sudo docker  exec -it  {netstatContainerName} netstat -tn | grep 42734 | grep {str(connect_status).upper()} | wc -l"
+            command = f"sudo docker  exec -it  {netstatContainerName} netstat -tn | grep {str(connect_status).upper()} | wc -l"
             process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
             output, error = process.communicate()
             result_=output.decode("utf-8")
