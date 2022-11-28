@@ -114,8 +114,8 @@ def getNetStat(connect_status,registry):
             process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
             output, error = process.communicate()
             result_=output.decode("utf-8")
-            cpuUsage_all = Gauge(connect_status, f'Count of {connect_status} connect', ["instance","container"],registry=registry)
-            cpuUsage_all.labels(instanceName,netstatContainerName).set(int(result_))
+            connect_status_ = Gauge(connect_status, f'Count of {connect_status} connect', ["instance","container"],registry=registry)
+            connect_status_.labels(instanceName,netstatContainerName).set(int(result_))
         except Exception as e:
             print(e)
 
